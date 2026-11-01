@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { ShieldCheck, KeyRound, LogOut, Menu, Plus, Database, CheckCircle2, X } from 'lucide-react';
+import { ShieldCheck, KeyRound, LogOut, Menu, Plus, Database, CheckCircle2, X, FileCode, Download, ExternalLink, Copy, Check } from 'lucide-react';
 import { PWAInstallButton } from '../common/PWAInstallButton';
 
 interface NavbarProps {
@@ -25,6 +25,19 @@ export const Navbar: React.FC<NavbarProps> = ({
     tables: Record<string, number>;
   } | null>(null);
   const [showDbModal, setShowDbModal] = useState(false);
+  const [copiedSql, setCopiedSql] = useState(false);
+
+  const handleCopySql = async () => {
+    try {
+      const res = await fetch('/supabase_schema_controle_murilo.sql');
+      const text = await res.text();
+      await navigator.clipboard.writeText(text);
+      setCopiedSql(true);
+      setTimeout(() => setCopiedSql(false), 2500);
+    } catch {
+      // Fallback
+    }
+  };
 
   useEffect(() => {
     fetch('/api/system/database-status')
@@ -273,6 +286,55 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               )}
 
+              {/* Exportação & Script SQL */}
+              <div className="p-3 bg-slate-900/80 rounded-xl border border-cyan-900/50 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 font-semibold text-cyan-300">
+                    <FileCode className="w-3.5 h-3.5" />
+                    <span>Script SQL do Banco Supabase</span>
+                  </div>
+                  <span className="text-[10px] text-cyan-400 font-mono">Pronto</span>
+                </div>
+                <p className="text-[11px] text-slate-300">
+                  Script DDL com todas as tabelas (clientes, produtos, tesouraria, empréstimos, narguiles, auditoria) e regras RLS.
+                </p>
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <button
+                    onClick={handleCopySql}
+                    className="flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-[11px] transition-colors"
+                  >
+                    {copiedSql ? (
+                      <>
+                        <Check className="w-3 h-3 text-emerald-400" />
+                        <span className="text-emerald-300 font-bold">Copiado!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3 text-slate-400" />
+                        <span>Copiar SQL</span>
+                      </>
+                    )}
+                  </button>
+                  <a
+                    href="/supabase_schema_controle_murilo.sql"
+                    download="supabase_schema_controle_murilo.sql"
+                    className="flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-800/80 font-medium text-[11px] transition-colors"
+                  >
+                    <Download className="w-3 h-3 text-emerald-400" />
+                    <span>Baixar .SQL</span>
+                  </a>
+                </div>
+                <a
+                  href="https://supabase.com/dashboard/project/zlyibbmhqmxqtyrbcbrt/sql/new"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/70 text-cyan-300 border border-cyan-800/70 font-medium text-[11px] transition-colors"
+                >
+                  <ExternalLink className="w-3 h-3 text-cyan-400" />
+                  <span>Abrir SQL Editor no Supabase</span>
+                </a>
+              </div>
+
               <p className="text-[11px] text-slate-400 leading-relaxed">
                 Todas as operações de criação, edição e exclusão de produtos, tesouraria, clientes e contratos são persistidas instantaneamente no seu banco Supabase.
               </p>
@@ -283,7 +345,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => setShowDbModal(false)}
                 className="w-full py-2 px-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs transition-colors"
               >
-                Entendido
+                Fechar
               </button>
             </div>
           </div>
