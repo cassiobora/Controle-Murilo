@@ -1,0 +1,6 @@
+{
+  "summary":  "Plano de implementação da arquitetura e desenvolvimento integral do Cérebro ERP, cobrindo segurança JWT/HMAC, auditoria imutável, estoque com Curva ABC, CRM fiscal, tesouraria avançada com parcelamento e DRE Simples Nacional, central de empréstimos, gestão de aluguel de narguiles e relatórios exportáveis.",
+  "updatedAt":  "2026-10-30T00:35:23.903063316Z",
+  "requestFeedback":  true,
+  "userFacing":  true
+}

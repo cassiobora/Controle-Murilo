@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="pt-BR" class="dark">
+  <head>
+    <script>
+      // Gracefully handle Vite HMR WebSocket in preview iframe
+      (function() {
+        if (typeof window === 'undefined') return;
+        var NativeWS = window.WebSocket;
+        if (!NativeWS) return;
+
+        class FakeHmrWS extends EventTarget {
+          constructor(url, protocols) {
+            super();
+            this.url = String(url || '');
+            this.protocol = Array.isArray(protocols) ? protocols.join(', ') : String(protocols || '');
+            this.readyState = 1; // OPEN
+            this.binaryType = 'blob';
+            this.bufferedAmount = 0;
+            this.extensions = '';
+            this.onopen = null;
+            this.onclose = null;
+            this.onerror = null;
+            this.onmessage = null;
+          }
+          send() {}
+          close() {
+            this.readyState = 3;
+          }
+        }
+
+        FakeHmrWS.prototype.CONNECTING = 0;
+        FakeHmrWS.prototype.OPEN = 1;
+        FakeHmrWS.prototype.CLOSING = 2;
+        FakeHmrWS.prototype.CLOSED = 3;
+        FakeHmrWS.CONNECTING = 0;
+        FakeHmrWS.OPEN = 1;
+        FakeHmrWS.CLOSING = 2;
+        FakeHmrWS.CLOSED = 3;
+
+        function ProxiedWebSocket(url, protocols) {
+          var urlStr = String(url || '');
+          var protoStr = Array.isArray(protocols) ? protocols.join(' ') : String(protocols || '');
+          if (
+            protoStr.indexOf('vite-hmr') !== -1 ||
+            urlStr.indexOf('vite-hmr') !== -1 ||
+            urlStr.indexOf('24678') !== -1 ||
+            urlStr.indexOf('token=') !== -1
+          ) {
+            return new FakeHmrWS(url, protocols);
+          }
+          return new NativeWS(url, protocols);
+        }
+
+        ProxiedWebSocket.CONNECTING = 0;
+        ProxiedWebSocket.OPEN = 1;
+        ProxiedWebSocket.CLOSING = 2;
+        ProxiedWebSocket.CLOSED = 3;
+        ProxiedWebSocket.prototype = NativeWS.prototype;
+
+        window.WebSocket = ProxiedWebSocket;
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Controle Murilo</title>
+    <meta name="description" content="Sistema integrado de gestão empresarial de alta performance com estoque, CRM fiscal, tesouraria analítica com DRE gerencial, empréstimos de capital e aluguel de narguiles." />
+    <meta property="og:title" content="Controle Murilo" />
+    <meta property="og:description" content="Sistema integrado de gestão empresarial de alta performance com estoque, CRM fiscal, tesouraria analítica com DRE gerencial, empréstimos de capital e aluguel de narguiles." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- PWA & Mobile Web App Meta -->
+    <meta name="theme-color" content="#0B0F19" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Controle Murilo" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      // Defensive handler: ignore iframe sandbox WebSocket disconnects
+      window.addEventListener('unhandledrejection', function(event) {
+        var reason = event && event.reason;
+        var msg = (reason && (reason.message || reason.toString())) || '';
+        if (msg.indexOf('WebSocket') !== -1) {
+          event.preventDefault();
+        }
+      });
+      window.addEventListener('error', function(event) {
+        var msg = (event && event.message) || '';
+        if (msg.indexOf('WebSocket') !== -1) {
+          event.preventDefault();
+        }
+      });
+    </script>
+  </head>
+  <body class="bg-[#0B0F19] text-slate-100 antialiased selection:bg-cyan-500 selection:text-white overscroll-none">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

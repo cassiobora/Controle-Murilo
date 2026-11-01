@@ -1,0 +1,6 @@
+{
+  "name": "Cérebro ERP",
+  "description": "Sistema integrado de gestão empresarial de alta performance com estoque, CRM fiscal, tesouraria analítica com DRE gerencial, empréstimos de capital e aluguel de narguiles.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
